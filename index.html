@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Inteligente - Processamento de Dados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6 flex flex-col items-center">
+
+    <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-xl">
+            <h2 class="text-2xl font-bold mb-6 text-white tracking-tight">Checkout</h2>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Preço Unitário (String)</label>
+                    <input type="text" id="inputPreco" placeholder="Ex: 125.50" 
+                        class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition placeholder-gray-600">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Quantidade (String)</label>
+                    <input type="text" id="inputQtd" placeholder="Ex: 3" 
+                        class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition placeholder-gray-600">
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+                    <input type="checkbox" id="inputCupom" class="w-5 h-5 accent-indigo-500 cursor-pointer">
+                    <label for="inputCupom" class="text-sm font-medium cursor-pointer select-none">Aplicar Cupom de Desconto (10%)</label>
+                </div>
+
+                <button onclick="executarSimulacao()" 
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg">
+                    PROCESSAR VALORES
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col h-full">
+            <div class="bg-black p-6 rounded-2xl border border-gray-700 font-mono text-sm flex-grow shadow-2xl relative">
+                <div class="flex gap-2 mb-4">
+                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-gray-600 text-xs ml-2 italic">system_logs_casting.js</span>
+                </div>
+                <div id="console-output" class="space-y-2">
+                    <span class="text-gray-500">// Insira os valores e clique em Processar...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl w-full mt-8 p-6 bg-gray-800 rounded-2xl border border-gray-700">
+        <h3 class="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest">Trecho do Código: Conversão de Tipos</h3>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 overflow-x-auto">
+            <code class="text-sm leading-relaxed">
+                <span class="text-pink-500">let</span> preco = <span class="text-blue-400">parseFloat</span>(inputPreco); <span class="text-gray-500">// String -> Float</span><br>
+                <span class="text-pink-500">let</span> qtd = <span class="text-blue-400">parseInt</span>(inputQtd); <span class="text-gray-500">// String -> Int</span><br>
+                <span class="text-pink-500">let</span> temCupom = <span class="text-blue-400">Boolean</span>(inputCupom.checked); <span class="text-gray-500">// Checkbox -> Bool</span>
+            </code>
+        </div>
+    </div>
+
+    <script>
+        function executarSimulacao() {
+            const output = document.getElementById('console-output');
+            
+            // Captura das Strings brutas dos inputs
+            let sPreco = document.getElementById('inputPreco').value;
+            let sQtd = document.getElementById('inputQtd').value;
+            let bCupom = document.getElementById('inputCupom').checked;
+
+            // --- APLICAÇÃO DE CASTING (A lógica que você pediu) ---
+            let preco = parseFloat(sPreco);
+            let qtd = parseInt(sQtd);
+            let temCupom = bCupom; 
+
+            // Cálculos
+            let subtotal = preco * qtd;
+            let desconto = temCupom ? subtotal * 0.1 : 0;
+            let totalFinal = subtotal - desconto;
+
+            // Verificação de NaN para tratamento de erro
+            let erroDetectado = isNaN(totalFinal);
+            let corStatus = erroDetectado ? "text-red-500" : "text-emerald-400";
+
+            output.innerHTML = `
+                <div class="text-indigo-400 font-bold border-b border-gray-800 pb-2 mb-2">RESULTADO DO PROCESSAMENTO</div>
+                <div class="text-gray-400">> Casting Preço: <span class="text-white">${preco}</span> <span class="text-xs text-gray-600">(${typeof preco})</span></div>
+                <div class="text-gray-400">> Casting Qtd: <span class="text-white">${qtd}</span> <span class="text-xs text-gray-600">(${typeof qtd})</span></div>
+                <div class="text-gray-400">> Cupom Booleano: <span class="text-white">${temCupom}</span> <span class="text-xs text-gray-600">(${typeof temCupom})</span></div>
+                <div class="text-gray-700">--------------------------------------</div>
+                <div class="${corStatus} font-bold tracking-wider">
+                    ${erroDetectado ? "> STATUS: ERRO (NaN detectado)" : "> STATUS: SUCESSO"}
+                </div>
+                <div class="text-2xl mt-4 ${corStatus} font-bold">
+                    ${erroDetectado ? "VALOR INVÁLIDO" : "R$ " + totalFinal.toFixed(2).replace('.', ',')}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
